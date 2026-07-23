@@ -1,0 +1,70 @@
+<section class="fate-aspects-content">
+
+  <header class="fate-scene-label" data-tooltip="{{localize "FATEASPECTS.SceneHint"}}">
+    <i class="fas fa-map"></i> <span>{{sceneName}}</span>
+  </header>
+
+  {{#if isGM}}
+  <div class="fate-add-row">
+    <input type="text" class="new-aspect-name" placeholder="{{localize "FATEASPECTS.AddPlaceholder"}}" />
+    <button type="button" data-action="addAspect" data-tooltip="{{localize "FATEASPECTS.Add"}}">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button type="button" data-action="addFromSelection" data-tooltip="{{localize "FATEASPECTS.AddFromSelection"}}">
+      <i class="fas fa-crosshairs"></i>
+    </button>
+  </div>
+  {{/if}}
+
+  <div class="fate-aspect-list">
+    {{#each aspects}}
+    <div class="fate-aspect" data-aspect-id="{{id}}">
+      <div class="fate-aspect-top">
+        <input type="text" class="aspect-name" value="{{name}}" {{#unless @root.isGM}}readonly{{/unless}} />
+        {{#if @root.isGM}}
+        <a class="drag-handle" data-mode="text" draggable="true" data-tooltip="{{localize "FATEASPECTS.DragText"}}">
+          <i class="fas fa-font"></i>
+        </a>
+        <a class="drag-handle" data-mode="token" draggable="true" data-tooltip="{{localize "FATEASPECTS.DragToken"}}">
+          <i class="fas fa-chess-pawn"></i>
+        </a>
+        <a class="delete-btn" data-action="deleteAspect" data-tooltip="{{localize "FATEASPECTS.Delete"}}">
+          <i class="fas fa-trash"></i>
+        </a>
+        {{/if}}
+      </div>
+      <div class="fate-aspect-counts">
+        <div class="count-group invoke" data-tooltip="{{localize "FATEASPECTS.Invokes"}}">
+          {{#if @root.isGM}}
+          <button type="button" data-action="adjust" data-type="invoke" data-delta="-1"><i class="fas fa-minus"></i></button>
+          {{/if}}
+          <span class="count-badge invoke">{{invoke}}</span>
+          {{#if @root.isGM}}
+          <button type="button" data-action="adjust" data-type="invoke" data-delta="1"><i class="fas fa-plus"></i></button>
+          {{/if}}
+        </div>
+        <div class="count-group compel" data-tooltip="{{localize "FATEASPECTS.Compels"}}">
+          {{#if @root.isGM}}
+          <button type="button" data-action="adjust" data-type="compel" data-delta="-1"><i class="fas fa-minus"></i></button>
+          {{/if}}
+          <span class="count-badge compel">{{compel}}</span>
+          {{#if @root.isGM}}
+          <button type="button" data-action="adjust" data-type="compel" data-delta="1"><i class="fas fa-plus"></i></button>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    {{else}}
+    <p class="fate-empty">{{localize "FATEASPECTS.Empty"}}</p>
+    {{/each}}
+  </div>
+
+  {{#if isGM}}
+  <footer class="fate-footer">
+    <button type="button" data-action="importLegacy" data-tooltip="{{localize "FATEASPECTS.ImportLegacyHint"}}">
+      <i class="fas fa-file-import"></i> {{localize "FATEASPECTS.ImportLegacy"}}
+    </button>
+  </footer>
+  {{/if}}
+
+</section>

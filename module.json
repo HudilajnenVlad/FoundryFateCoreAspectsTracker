@@ -1,0 +1,37 @@
+{
+  "id": "fate-core-aspects-tracker",
+  "title": "Fate Core Aspects Tracker",
+  "description": "Scene-bound aspect tracker for Fate Core games: manage aspects, invokes and compels, and place them on the canvas as clean text labels or tokens with roll20-style invoke/compel badges.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "HudilajnenVlad",
+      "url": "https://github.com/HudilajnenVlad"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/fate-aspects.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "lang/ru.json"
+    }
+  ],
+  "url": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker",
+  "manifest": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/releases/latest/download/module.json",
+  "download": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/releases/latest/download/module.zip"
+}
