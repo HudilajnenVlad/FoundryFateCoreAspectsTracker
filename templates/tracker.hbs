@@ -52,6 +52,11 @@
           <button type="button" data-action="adjust" data-type="compel" data-delta="1"><i class="fas fa-plus"></i></button>
           {{/if}}
         </div>
+        {{#if @root.isGM}}
+        <select class="aspect-type" data-tooltip="{{localize "FATEASPECTS.TypeTooltip"}}">
+          {{selectOptions @root.tokenTypeChoices selected=tokenType}}
+        </select>
+        {{/if}}
       </div>
     </div>
     {{else}}

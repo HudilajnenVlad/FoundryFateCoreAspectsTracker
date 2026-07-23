@@ -2,7 +2,7 @@
   "id": "fate-core-aspects-tracker",
   "title": "Fate Core Aspects Tracker",
   "description": "Scene-bound aspect tracker for Fate Core games: manage aspects, invokes and compels, and place them on the canvas as clean text labels or tokens with roll20-style invoke/compel badges.",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "compatibility": {
     "minimum": "12",
     "verified": "13"

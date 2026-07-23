@@ -7,7 +7,7 @@ import { MODULE_ID, getAspects, adjustAspect, importLegacyMacroAspects } from ".
 import { openTracker, toggleTracker, refreshTracker } from "./app.mjs";
 import {
   handleCanvasDrop, drawTokenBadges, refreshBadges, syncPlacements,
-  onUpdateDrawing, onUpdateToken, targetAspectId
+  onUpdateDrawing, onUpdateToken, onRefreshDrawing, targetAspectId
 } from "./placement.mjs";
 import { onRenderHUD } from "./hud.mjs";
 
@@ -167,6 +167,11 @@ for (const hook of ["createDrawing", "deleteDrawing", "createToken", "deleteToke
 Hooks.on("refreshToken", token => {
   if (token.document.getFlag(MODULE_ID, "aspectId")) drawTokenBadges(token);
 });
+
+// Strip Foundry's automatic text outline/shadow from aspect labels,
+// both when the drawing is first drawn and on every later refresh
+Hooks.on("drawDrawing", onRefreshDrawing);
+Hooks.on("refreshDrawing", onRefreshDrawing);
 
 // Drops from the tracker window onto the canvas
 Hooks.on("dropCanvasData", handleCanvasDrop);

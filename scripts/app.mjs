@@ -4,8 +4,9 @@
 
 import {
   MODULE_ID, sortedAspects, getAspect, createAspect, adjustAspect,
-  renameAspect, deleteAspect, importLegacyMacroAspects
+  renameAspect, deleteAspect, importLegacyMacroAspects, updateAspect
 } from "./data.mjs";
+import { ASPECT_TYPES } from "./placement.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
@@ -34,10 +35,14 @@ export class AspectTrackerApp extends HandlebarsApplicationMixin(ApplicationV2) 
   };
 
   async _prepareContext(_options) {
+    const tokenTypeChoices = Object.fromEntries(
+      Object.entries(ASPECT_TYPES).map(([key, t]) => [key, game.i18n.localize(t.label)])
+    );
     return {
       isGM: game.user.isGM,
       sceneName: canvas?.scene?.name ?? "—",
-      aspects: sortedAspects()
+      aspects: sortedAspects().map(a => ({ ...a, tokenType: a.tokenType ?? "aspect" })),
+      tokenTypeChoices
     };
   }
 
@@ -51,6 +56,14 @@ export class AspectTrackerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         const id = ev.currentTarget.closest("[data-aspect-id]")?.dataset.aspectId;
         const ok = await renameAspect(id, ev.currentTarget.value);
         if (!ok) ev.currentTarget.value = getAspect(id)?.name ?? "";
+      });
+    });
+
+    // Token type dropdown: remembers the type and re-skins placed tokens
+    html.querySelectorAll("select.aspect-type").forEach(select => {
+      select.addEventListener("change", async ev => {
+        const id = ev.currentTarget.closest("[data-aspect-id]")?.dataset.aspectId;
+        await updateAspect(id, { tokenType: ev.currentTarget.value });
       });
     });
 

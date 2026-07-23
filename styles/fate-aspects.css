@@ -119,6 +119,12 @@
   background: #d42a2a;
 }
 
+.fate-aspects-tracker select.aspect-type {
+  margin-left: auto;
+  max-width: 175px;
+  font-size: var(--font-size-12, 12px);
+}
+
 .fate-aspects-tracker .fate-empty {
   text-align: center;
   opacity: 0.7;
@@ -131,63 +137,39 @@
 
 /* ---------------------------------------- */
 /* Token / Drawing HUD extension            */
+/* Native control icons in the right column */
 /* ---------------------------------------- */
 
-#hud .fate-aspect-hud,
-.placeable-hud .fate-aspect-hud {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  pointer-events: all;
-}
-
-.fate-aspect-hud .fate-hud-group {
+.placeable-hud .fate-hud-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid #333;
-  border-radius: 16px;
-  padding: 2px 6px;
+  justify-content: center;
 }
 
-.fate-aspect-hud .fate-hud-group .count {
-  min-width: 20px;
-  height: 20px;
+.placeable-hud .fate-hud-count {
+  min-width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   color: #fff;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 13px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
 }
 
-.fate-aspect-hud .fate-hud-group.invoke .count {
+.placeable-hud .fate-hud-count.invoke {
   background: #2e9e3f;
 }
 
-.fate-aspect-hud .fate-hud-group.compel .count {
+.placeable-hud .fate-hud-count.compel {
   background: #d42a2a;
 }
 
-.fate-aspect-hud button {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  margin: 0;
-  line-height: 1;
-  font-size: 10px;
-  color: #ddd;
-  background: transparent;
+.placeable-hud .fate-hud-type img {
+  width: 26px;
+  height: 26px;
   border: none;
-  cursor: pointer;
-}
-
-.fate-aspect-hud button:hover {
-  color: #fff;
-  text-shadow: 0 0 6px red;
+  object-fit: contain;
 }

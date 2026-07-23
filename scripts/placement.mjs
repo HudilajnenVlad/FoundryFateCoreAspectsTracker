@@ -10,6 +10,37 @@ import {
 
 const BADGE_CONTAINER = "fate-aspect-badges";
 
+/**
+ * Token type variants, mirroring the classic roll20 Fate token set.
+ * The generic "aspect" type uses the image from module settings.
+ */
+export const ASPECT_TYPES = {
+  aspect: { label: "FATEASPECTS.Types.aspect", img: null },
+  situation: { label: "FATEASPECTS.Types.situation", img: "assets/aspect-token-sa.svg" },
+  boost: { label: "FATEASPECTS.Types.boost", img: "assets/aspect-token-b.svg" },
+  consequence: { label: "FATEASPECTS.Types.consequence", img: "assets/aspect-token-c.svg" },
+  game: { label: "FATEASPECTS.Types.game", img: "assets/aspect-token-ga.svg" }
+};
+
+export function tokenImageForType(type) {
+  const t = ASPECT_TYPES[type] ?? ASPECT_TYPES.aspect;
+  return t.img ? `modules/${MODULE_ID}/${t.img}` : game.settings.get(MODULE_ID, "tokenImage");
+}
+
+/* -------------------------------------------- */
+/*  Token type chooser dialog                   */
+/* -------------------------------------------- */
+
+/** Advance an aspect's token type to the next one in the list. Returns the new type. */
+export async function cycleAspectType(aspectId, scene = canvas?.scene) {
+  const aspect = getAspect(aspectId, scene);
+  if (!aspect) return null;
+  const order = Object.keys(ASPECT_TYPES);
+  const next = order[(order.indexOf(aspect.tokenType ?? "aspect") + 1) % order.length];
+  await updateAspect(aspectId, { tokenType: next }, scene);
+  return next;
+}
+
 /* -------------------------------------------- */
 /*  Placement (drop from the tracker window)    */
 /* -------------------------------------------- */
@@ -72,14 +103,15 @@ export async function placeAspectDrawing(aspectId, x, y, scene = canvas?.scene) 
 }
 
 /** Create an actorless token for an aspect. Badges are drawn on refresh. */
-export async function placeAspectToken(aspectId, x, y, scene = canvas?.scene) {
+export async function placeAspectToken(aspectId, x, y, type = null, scene = canvas?.scene) {
   const aspect = getAspect(aspectId, scene);
   if (!aspect) return;
+  type = type ?? aspect.tokenType ?? "aspect";
   const size = scene.grid.size ?? 100;
   try {
     await scene.createEmbeddedDocuments("Token", [{
       name: aspect.name,
-      texture: { src: game.settings.get(MODULE_ID, "tokenImage") },
+      texture: { src: tokenImageForType(type) },
       x: x - size / 2,
       y: y - size / 2,
       width: 1,
@@ -89,10 +121,30 @@ export async function placeAspectToken(aspectId, x, y, scene = canvas?.scene) {
       lockRotation: true,
       flags: { [MODULE_ID]: { aspectId } }
     }]);
+    if (aspect.tokenType !== type) await updateAspect(aspectId, { tokenType: type }, scene);
     ui.notifications.info(game.i18n.format("FATEASPECTS.Notify.Placed", { name: aspect.name }));
   } catch (e) {
     console.error(`${MODULE_ID} |`, e);
     ui.notifications.error(game.i18n.localize("FATEASPECTS.Notify.PlaceFailed"));
+  }
+}
+
+/* -------------------------------------------- */
+/*  Clean text rendering (no glyph outline)     */
+/* -------------------------------------------- */
+
+/**
+ * Foundry adds a contrasting stroke and drop shadow around drawing text
+ * for legibility (a white outline around dark text). Strip both from our
+ * aspect labels on every refresh so the text renders clean.
+ */
+export function onRefreshDrawing(drawing) {
+  if (!drawing.document.getFlag(MODULE_ID, "aspectId")) return;
+  const text = drawing.text;
+  if (!text?.style) return;
+  if (text.style.strokeThickness !== 0 || text.style.dropShadow) {
+    text.style.strokeThickness = 0;
+    text.style.dropShadow = false;
   }
 }
 
@@ -183,8 +235,11 @@ export async function syncPlacements(scene) {
   for (const d of scene.drawings) {
     const id = d.getFlag(MODULE_ID, "aspectId");
     if (!id || !aspects[id]) continue;
+    const update = { _id: d.id };
     const text = buildAspectText(aspects[id]);
-    if (d.text !== text) drawingUpdates.push({ _id: d.id, text });
+    if (d.text !== text) update.text = text;
+    if (d.strokeWidth !== 0 || d.strokeAlpha !== 0) Object.assign(update, { strokeWidth: 0, strokeAlpha: 0 });
+    if (Object.keys(update).length > 1) drawingUpdates.push(update);
   }
   if (drawingUpdates.length) await scene.updateEmbeddedDocuments("Drawing", drawingUpdates);
 
@@ -192,7 +247,13 @@ export async function syncPlacements(scene) {
   for (const t of scene.tokens) {
     const id = t.getFlag(MODULE_ID, "aspectId");
     if (!id || !aspects[id]) continue;
-    if (t.name !== aspects[id].name) tokenUpdates.push({ _id: t.id, name: aspects[id].name });
+    const update = { _id: t.id };
+    if (t.name !== aspects[id].name) update.name = aspects[id].name;
+    const img = tokenImageForType(aspects[id].tokenType ?? "aspect");
+    // Compare against source data: prepared data can lag behind and would
+    // otherwise cause repeated no-op updates
+    if (t._source.texture.src !== img) update.texture = { src: img };
+    if (Object.keys(update).length > 1) tokenUpdates.push(update);
   }
   if (tokenUpdates.length) await scene.updateEmbeddedDocuments("Token", tokenUpdates);
 }
@@ -217,8 +278,19 @@ export async function onUpdateDrawing(doc, changes, _options, userId) {
   await updateAspect(aspectId, parsed, doc.parent);
 }
 
-/** User renamed a linked token directly on the canvas. */
+/** React to updates of linked tokens. */
 export async function onUpdateToken(doc, changes, _options, userId) {
+  // Texture changed (type re-skin): re-prepare and redraw on every client.
+  // Prepared token data does not always pick up texture updates on its own,
+  // so re-check shortly after the update cycle completes.
+  if (doc.getFlag(MODULE_ID, "aspectId") && changes.texture?.src !== undefined) {
+    setTimeout(() => {
+      if (doc._source.texture.src !== doc.texture.src) doc.reset();
+      doc.object?.draw();
+    }, 100);
+  }
+
+  // Rename on the canvas -> rename the aspect (editing GM client only)
   if (game.user.id !== userId || !game.user.isGM) return;
   if (changes.name === undefined) return;
   const aspectId = doc.getFlag(MODULE_ID, "aspectId");
