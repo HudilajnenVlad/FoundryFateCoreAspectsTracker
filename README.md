@@ -17,7 +17,18 @@ Grew out of a macro; the module preserves everything the macro did and adds scen
   - Hover (or select) an aspect token/label and press a hotkey: `I` / `Shift+I` for invokes, `O` / `Shift+O` for compels (GM only, rebindable).
 - **Migration** — the *Import from macro storage* button in the window copies aspects saved by the old macro (`world.fate-aspects` setting) into the current scene.
 
-## Installation (manual, until a release is published)
+## Installation
+
+In Foundry, open **Add-on Modules → Install Module**, paste this manifest URL and click Install:
+
+```
+https://raw.githubusercontent.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/main/module.json
+```
+
+Then enable *Fate Core Aspects Tracker* in your world's module management.
+
+<details>
+<summary>Manual installation</summary>
 
 Copy this repository into your Foundry data folder as:
 
@@ -25,7 +36,8 @@ Copy this repository into your Foundry data folder as:
 FoundryVTT/Data/modules/fate-core-aspects-tracker/
 ```
 
-The folder name **must** be `fate-core-aspects-tracker` (the module id). Then enable *Fate Core Aspects Tracker* in your world's module management.
+The folder name **must** be `fate-core-aspects-tracker` (the module id).
+</details>
 
 ## Settings
 
@@ -56,4 +68,10 @@ api.importLegacyMacroAspects(); // migrate macro data into the current scene
 - Изменения в окне синхронизируются с объектами на столе и обратно.
 - Кнопка «Импорт из хранилища макроса» переносит аспекты, сохранённые старым макросом, в текущую сцену.
 
-Установка: скопируйте репозиторий в `FoundryVTT/Data/modules/fate-core-aspects-tracker/` (имя папки должно совпадать с id модуля) и включите модуль в мире.
+Установка: в Foundry откройте **Add-on Modules → Install Module**, вставьте ссылку на манифест и нажмите Install:
+
+```
+https://raw.githubusercontent.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/main/module.json
+```
+
+После установки включите модуль в настройках мира.

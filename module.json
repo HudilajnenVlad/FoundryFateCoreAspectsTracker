@@ -32,6 +32,6 @@
     }
   ],
   "url": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker",
-  "manifest": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/releases/latest/download/module.json",
-  "download": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/releases/latest/download/module.zip"
+  "manifest": "https://raw.githubusercontent.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/main/module.json",
+  "download": "https://github.com/HudilajnenVlad/FoundryFateCoreAspectsTracker/archive/refs/heads/main.zip"
 }
